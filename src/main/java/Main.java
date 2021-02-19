@@ -14,11 +14,22 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
-
+    double averageOverride = 0.0;
+    double averageFields = 0.0;
+    int countFields = 0;
+    int countOverride = 0;
+    double ABC = 0.0;
+    int A = 0;
+    int B = 0;
+    int C = 0;
+    double averageDepth = 0.0;
+    int maxDepth = 0;
+    HashMap<String, String> classes = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         Main m = new Main();
         m.reader();
+        m.summary();
     }
 
     private static void printTree(ParseTree tree, int indentation, KotlinLexer lexer) throws Exception {
@@ -64,7 +75,6 @@ public class Main {
         System.out.println(ruleName);
     }
 
-
     public void startParse(File file) throws Exception {
         String key = "";
         String value = "";
@@ -78,7 +88,6 @@ public class Main {
         int a = 0;
         int b = 0;
         int c = 0;
-        //ArrayList<String> identifiers = new ArrayList<>();
         HashMap<String, String> extend = new HashMap<>();
         HashSet<String> operatorsA = new HashSet<String>(List.of("++", "--", "=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", "&=", "!=", "^=", ">>>="));
         HashSet<String> operatorsC = new HashSet<String>(List.of("==", "!=", ">=", "<=", ">", "<", "!", "else", "if", "?", "try", "catch", "when"));
@@ -116,8 +125,10 @@ public class Main {
                 waitClass = false;
                 extend.put(key, value);
             }
-            if (currToken.equals("{") || currToken.equals("=")) {
+            if (waitClass && (currToken.equals("{") || currToken.equals("="))) {
                 waitClass = false;
+                extend.put(key, "");
+                System.out.println("---------------check   "+extend+"   value  "+ value);
             }
             if (currToken.equals("override")) {
                 override++;
@@ -140,13 +151,42 @@ public class Main {
             if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const")) && !fun) {
                 fields++;
             }
-
-
-
             System.out.println("token " + currToken + " tokentype " + currTokenType);
         }
+        metricHandler(a, b, c, fields, override, extend);
         //printTree(tree, 0, lexer);
         System.out.println("fields=" + fields + " override=" + override + " a metric=" + a + " b metric=" + b + " c metric=" + c + " key=" + key + " value=" + value);
+    }
+
+    public void metricHandler(int a, int b, int c, int fields, int override, HashMap<String, String> extend) {
+        A += a;
+        B += b;
+        C += c;
+        averageOverride += override;
+        countOverride += 1;
+        averageFields += fields;
+        countFields += 1;
+        classes.putAll(extend);
+    }
+
+    public void summary() {
+        ABC = Math.sqrt(A * A + B * B + C * C);
+        for (String key : classes.keySet()) {
+            String k = key;
+            int count = 0;
+            while (classes.get(k) != null) {
+                count++;
+                k = classes.get(k);
+            }
+            if (count > maxDepth) maxDepth = count;
+            averageDepth += count;
+        }
+        averageDepth = averageDepth / classes.size();
+        averageFields = averageFields / countFields;
+        averageOverride = averageOverride / countOverride;
+        System.out.println("ABC=" + ABC + " averageDepth=" + averageDepth + " maxDepth="
+                + maxDepth + " averageFields=" + averageFields + " averageOverride=" + averageOverride);
+        System.out.println(classes);
     }
 
     public void reader() throws Exception {

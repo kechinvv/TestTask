@@ -22,16 +22,18 @@ public class Parse {
         return metrics;
     }
 
-    public void reader() throws Exception {
+    public void reader(String dir) throws Exception {
         List<File> list = new ArrayList<>();
-        Files.walk(Paths.get("C:\\Users\\valer\\IdeaProjects\\forparse\\src"), FileVisitOption.FOLLOW_LINKS)
+        Files.walk(Paths.get(dir), FileVisitOption.FOLLOW_LINKS)
                 .map(Path::toFile)
                 .forEach(f -> {
                     if (f.isFile()) list.add(f);
                 });
         list.removeIf(f -> !f.getName().endsWith(".kt"));
         System.out.println(list);
-        startParse(list.get(0));
+        for (File file : list) {
+            startParse(file);
+        }
     }
 
     public void startParse(File file) throws Exception {

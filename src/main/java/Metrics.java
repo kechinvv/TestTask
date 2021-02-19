@@ -1,8 +1,12 @@
 import com.google.gson.JsonObject;
 
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
+
+import static java.nio.file.StandardOpenOption.*;
 
 public class Metrics {
     double averageOverride = 0.0;
@@ -28,7 +32,7 @@ public class Metrics {
         classes.putAll(extend);
     }
 
-    public void summary() throws IOException {
+    public void summary(String arg) throws IOException {
         ABC = Math.sqrt(A * A + B * B + C * C);
         for (String key : classes.keySet()) {
             String k = key;
@@ -45,24 +49,24 @@ public class Metrics {
         averageOverride = averageOverride / countOverride;
         System.out.println("ABC=" + ABC + " averageDepth=" + averageDepth + " maxDepth="
                 + maxDepth + " averageFields=" + averageFields + " averageOverride=" + averageOverride);
-      //  System.out.println(classes);
-        createJson();
+        //  System.out.println(classes);
+        createJson(arg);
     }
 
-    private void createJson() throws IOException {
+    private void createJson(String arg) throws IOException {
         JsonObject m = new JsonObject();
         m.addProperty("maxDepth", maxDepth);
         m.addProperty("averageDepth", averageDepth);
         m.addProperty("ABC", ABC);
         m.addProperty("averageFields", averageFields);
         m.addProperty("averageOverride", averageOverride);
-        try (FileWriter file = new FileWriter("m.json")) {
+        String path;
+        if (arg.endsWith(".json")) path = arg;
+        else path = arg + ".json";
+        Path path1 = Paths.get(path);
 
-            file.write(String.valueOf(m));
-            file.flush();
+        Files.write(path1, m.toString().getBytes(), CREATE, WRITE, TRUNCATE_EXISTING);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 }

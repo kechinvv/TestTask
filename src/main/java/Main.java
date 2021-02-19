@@ -1,23 +1,14 @@
-import ktlex.KotlinLexer;
-import ktpars.KotlinParser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
-
-import java.io.File;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
+        if (args.length != 2) {
+            System.out.println("Incorrect args");
+            throw new IllegalArgumentException();
+        }
         Parse p = new Parse();
-        p.reader();
-        p.getMetric().summary();
+        p.reader(args[0]);
+        p.getMetric().summary(args[1]);
     }
 
 

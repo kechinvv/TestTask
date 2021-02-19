@@ -1,3 +1,7 @@
+import com.google.gson.JsonObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Metrics {
@@ -24,7 +28,7 @@ public class Metrics {
         classes.putAll(extend);
     }
 
-    public void summary() {
+    public void summary() throws IOException {
         ABC = Math.sqrt(A * A + B * B + C * C);
         for (String key : classes.keySet()) {
             String k = key;
@@ -42,5 +46,23 @@ public class Metrics {
         System.out.println("ABC=" + ABC + " averageDepth=" + averageDepth + " maxDepth="
                 + maxDepth + " averageFields=" + averageFields + " averageOverride=" + averageOverride);
       //  System.out.println(classes);
+        createJson();
+    }
+
+    private void createJson() throws IOException {
+        JsonObject m = new JsonObject();
+        m.addProperty("maxDepth", maxDepth);
+        m.addProperty("averageDepth", averageDepth);
+        m.addProperty("ABC", ABC);
+        m.addProperty("averageFields", averageFields);
+        m.addProperty("averageOverride", averageOverride);
+        try (FileWriter file = new FileWriter("m.json")) {
+
+            file.write(String.valueOf(m));
+            file.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

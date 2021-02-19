@@ -48,4 +48,5 @@ public class PrintTree {
         ruleName[0] = Character.toLowerCase(ruleName[0]);
         System.out.println(ruleName);
     }
+
 }

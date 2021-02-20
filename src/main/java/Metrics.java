@@ -11,8 +11,7 @@ import static java.nio.file.StandardOpenOption.*;
 public class Metrics {
     double averageOverride = 0.0;
     double averageFields = 0.0;
-    int countFields = 0;
-    int countOverride = 0;
+    int countClasses=0;
     double ABC = 0.0;
     int A = 0;
     int B = 0;
@@ -21,14 +20,13 @@ public class Metrics {
     int maxDepth = 0;
     HashMap<String, String> classes = new HashMap<>();
 
-    public void metricHandler(int a, int b, int c, int fields, int override, HashMap<String, String> extend) {
+    public void metricHandler(int a, int b, int c, int fields, int override, HashMap<String, String> extend, int countClass) {
         A += a;
         B += b;
         C += c;
         averageOverride += override;
-        countOverride += 1;
+        countClasses+=countClass;
         averageFields += fields;
-        countFields += 1;
         classes.putAll(extend);
      //   System.out.println(fields);
     }
@@ -47,8 +45,8 @@ public class Metrics {
             averageDepth += count;
         }
         averageDepth = averageDepth / classes.size();
-        averageFields = averageFields / countFields;
-        averageOverride = averageOverride / countOverride;
+        averageFields = averageFields / countClasses;
+        averageOverride = averageOverride / countClasses;
         System.out.println("ABC=" + ABC + " averageDepth=" + averageDepth + " maxDepth="
                 + maxDepth + " averageFields=" + averageFields + " averageOverride=" + averageOverride);
        //  System.out.println(classes);

@@ -43,6 +43,10 @@ public class Parse {
         boolean val = false;
         boolean wait = false;
         boolean waitClass = false;
+        boolean startClass = false;
+        boolean waitStartClass = false;
+        int countClass = 0;
+        int totalBracket=0;
         int override = 0;
         int fields = 0;
         int bracket = 0;
@@ -64,6 +68,8 @@ public class Parse {
             if (prevToken.equals("class") && currTokenType.equals("Identifier")) {
                 key = currToken;
                 waitClass = true;
+                countClass++;
+                waitStartClass =true;
             }
             if ((currToken.equals("val") || currToken.equals("var") || currToken.equals("const")) && operatorsA.contains(tokens.get(i + 2).getText())) {
                 val = true;
@@ -90,6 +96,10 @@ public class Parse {
                 waitClass = false;
                 extend.put(key, "");
             }
+            if (waitStartClass && currToken.equals("{")){
+                waitStartClass=false;
+                startClass=true;
+            }
             if (currToken.equals("override")) {
                 override++;
             }
@@ -108,13 +118,22 @@ public class Parse {
                     if (!wait && bracket == 0) fun = false;
                 }
             }
-            if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const")) && !fun) {
+            if (startClass) {
+                if (currTokenType.equals("{")) {
+                    totalBracket++;
+                }
+                if (currTokenType.equals("}")) {
+                    totalBracket--;
+                    if (totalBracket == 0) startClass = false;
+                }
+            }
+            if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const")) && !fun && startClass) {
                 fields++;
             }
             //  System.out.println("token " + currToken + " tokentype " + currTokenType);
         }
 
-        metrics.metricHandler(a, b, c, fields, override, extend);
+        metrics.metricHandler(a, b, c, fields, override, extend, countClass);
        // PrintTree.printTree(tree, 0, lexer);
         //  System.out.println("fields=" + fields + " override=" + override + " a metric=" + a + " b metric=" + b + " c metric=" + c);
     }

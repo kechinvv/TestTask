@@ -41,6 +41,7 @@ public class Metrics {
             while (classes.get(k) != null) {
                 count++;
                 k = classes.get(k);
+                if (!k.equals("") && !classes.containsKey(k)) count++;
             }
             if (count > maxDepth) maxDepth = count;
             averageDepth += count;

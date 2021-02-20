@@ -1,3 +1,15 @@
+/**
+ * Kotlin Grammar for ANTLR v4
+ *
+ * Based on:
+ * http://jetbrains.github.io/kotlin-spec/#_grammars_and_parsing
+ * and
+ * http://kotlinlang.org/docs/reference/grammar.html
+ *
+ * Tested on
+ * https://github.com/JetBrains/kotlin/tree/master/compiler/testData/psi
+ */
+
 lexer grammar KotlinLexer;
 
 import UnicodeClasses;
@@ -30,7 +42,9 @@ RESERVED: '...' ;
 DOT: '.' ;
 COMMA: ',' ;
 LPAREN: '(' -> pushMode(Inside) ;
+RPAREN: ')' ;
 LSQUARE: '[' -> pushMode(Inside) ;
+RSQUARE: ']' ;
 LCURL: '{' ;
 RCURL: '}' ;
 MULT: '*' ;
@@ -170,7 +184,7 @@ FloatLiteral
     ;
 
 DoubleLiteral
-    : ( (DecDigitNoZero DecDigit*)? '.'
+    : ( (DecDigitNoZero DecDigit* | '0')? '.'
       | (DecDigitNoZero (DecDigit | '_')* DecDigit)? '.')
      ( DecDigit+
       | DecDigit (DecDigit | '_')+ DecDigit
@@ -315,8 +329,8 @@ fragment Letter
 
 mode Inside ;
 
-RPAREN: ')' -> popMode ;
-RSQUARE: ']' -> popMode;
+Inside_RPAREN: ')' -> popMode, type(RPAREN) ;
+Inside_RSQUARE: ']' -> popMode, type(RSQUARE);
 
 Inside_LPAREN: LPAREN -> pushMode(Inside), type(LPAREN) ;
 Inside_LSQUARE: LSQUARE -> pushMode(Inside), type(LSQUARE) ;
@@ -346,6 +360,7 @@ Inside_MOD_ASSIGNMENT: MOD_ASSIGNMENT  -> type(MOD_ASSIGNMENT) ;
 Inside_ARROW: ARROW  -> type(ARROW) ;
 Inside_DOUBLE_ARROW: DOUBLE_ARROW  -> type(DOUBLE_ARROW) ;
 Inside_RANGE: RANGE  -> type(RANGE) ;
+Inside_RESERVED: RESERVED -> type(RESERVED) ;
 Inside_COLONCOLON: COLONCOLON  -> type(COLONCOLON) ;
 Inside_Q_COLONCOLON: Q_COLONCOLON -> type(Q_COLONCOLON) ;
 Inside_DOUBLE_SEMICOLON: DOUBLE_SEMICOLON  -> type(DOUBLE_SEMICOLON) ;
@@ -504,6 +519,8 @@ StrExpr_RCURL: RCURL -> popMode, type(RCURL) ;
 StrExpr_LPAREN: LPAREN -> pushMode(Inside), type(LPAREN) ;
 StrExpr_LSQUARE: LSQUARE -> pushMode(Inside), type(LSQUARE) ;
 
+StrExpr_RPAREN: ')' -> type(RPAREN) ;
+StrExpr_RSQUARE: ']' -> type(RSQUARE);
 StrExpr_LCURL: LCURL -> pushMode(StringExpression), type(LCURL) ;
 StrExpr_DOT: DOT -> type(DOT) ;
 StrExpr_COMMA: COMMA  -> type(COMMA) ;

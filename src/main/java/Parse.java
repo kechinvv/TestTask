@@ -89,7 +89,6 @@ public class Parse {
             if (waitClass && (currToken.equals("{") || currToken.equals("="))) {
                 waitClass = false;
                 extend.put(key, "");
-                System.out.println("---------------check   " + extend + "   value  " + value);
             }
             if (currToken.equals("override")) {
                 override++;
@@ -116,7 +115,7 @@ public class Parse {
         }
 
         metrics.metricHandler(a, b, c, fields, override, extend);
-        PrintTree.printTree(tree, 0, lexer);
+       // PrintTree.printTree(tree, 0, lexer);
         //  System.out.println("fields=" + fields + " override=" + override + " a metric=" + a + " b metric=" + b + " c metric=" + c);
     }
 

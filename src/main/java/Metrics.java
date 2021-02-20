@@ -30,6 +30,7 @@ public class Metrics {
         averageFields += fields;
         countFields += 1;
         classes.putAll(extend);
+     //   System.out.println(fields);
     }
 
     public void summary(String arg) throws IOException {
@@ -49,7 +50,7 @@ public class Metrics {
         averageOverride = averageOverride / countOverride;
         System.out.println("ABC=" + ABC + " averageDepth=" + averageDepth + " maxDepth="
                 + maxDepth + " averageFields=" + averageFields + " averageOverride=" + averageOverride);
-        //  System.out.println(classes);
+       //  System.out.println(classes);
         createJson(arg);
     }
 

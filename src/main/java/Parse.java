@@ -134,7 +134,7 @@ public class Parse {
         }
 
         metrics.metricHandler(a, b, c, fields, override, extend, countClass);
-       // PrintTree.printTree(tree, 0, lexer);
+        PrintTree.printTree(tree, 0, lexer);
         //  System.out.println("fields=" + fields + " override=" + override + " a metric=" + a + " b metric=" + b + " c metric=" + c);
     }
 

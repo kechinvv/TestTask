@@ -100,7 +100,7 @@ public class Parse {
                 waitStartClass = false;
                 startClass = true;
             }
-            if (currToken.equals("override")) {
+            if (currToken.equals("fun") && prevToken.equals("override") ) {
                 override++;
             }
 

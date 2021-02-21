@@ -54,7 +54,7 @@ public class Parse {
         int c = 0;
         HashMap<String, String> extend = new HashMap<>();
         HashSet<String> operatorsA = new HashSet<String>(List.of("++", "--", "=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", "&=", "!=", "^=", ">>>="));
-        HashSet<String> operatorsC = new HashSet<String>(List.of("==", "!=", ">=", "<=", ">", "<", "!", "else", "if", "?", "try", "catch", "when"));
+        HashSet<String> operatorsC = new HashSet<String>(List.of("?:","===","!==", "==", "!=", ">=", "<=", ">", "<", "!", "else", "if", "?", "try", "catch", "when"));
         CharStream charFile = CharStreams.fromFileName(file.getAbsolutePath());
         KotlinLexer lexer = new KotlinLexer(charFile);
         TokenStream tokens = new CommonTokenStream(lexer);

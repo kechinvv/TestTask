@@ -40,13 +40,12 @@ public class Parse {
         String key = "";
         String value = "";
         boolean fun = false;
-        boolean val = false;
         boolean wait = false;
         boolean waitClass = false;
         boolean startClass = false;
         boolean waitStartClass = false;
         int countClass = 0;
-        int totalBracket=0;
+        int totalBracket = 0;
         int override = 0;
         int fields = 0;
         int bracket = 0;
@@ -61,33 +60,34 @@ public class Parse {
         TokenStream tokens = new CommonTokenStream(lexer);
         KotlinParser parser = new KotlinParser(tokens);
         KotlinParser.KotlinFileContext tree = parser.kotlinFile();
-        for (int i = 1; i < tokens.size(); i++) {
-            String prevToken = tokens.get(i - 1).getText();
+        for (int i = 0; i < tokens.size(); i++) {
+            String prevToken = "";
+            if (i > 0) prevToken = tokens.get(i - 1).getText();
             String currToken = tokens.get(i).getText();
             String currTokenType = lexer.getVocabulary().getDisplayName(tokens.get(i).getType());
             if (prevToken.equals("class") && currTokenType.equals("Identifier")) {
                 key = currToken;
                 waitClass = true;
                 countClass++;
-                waitStartClass =true;
+                waitStartClass = true;
             }
-            if ((currToken.equals("val") || currToken.equals("var") || currToken.equals("const")) && operatorsA.contains(tokens.get(i + 2).getText())) {
-                val = true;
+            if ((currToken.equals("val") || currToken.equals("var") || currToken.equals("const")) && tokens.size() > i + 2
+                    && operatorsA.contains(tokens.get(i + 2).getText())) {
+                a--;
             }
-            if (operatorsA.contains(currToken) && !val) {
+            if (operatorsA.contains(currToken)) {
                 a++;
             }
-            if (val && operatorsA.contains(currToken)) {
-                val = false;
-            }
-            if (currTokenType.equals("Identifier") && tokens.get(i + 1).getText().equals("(") && !prevToken.equals("fun") && !waitClass) {
+            if (currTokenType.equals("Identifier") && tokens.get(i + 1).getText().equals("(") && tokens.size() > i + 1
+                    && !prevToken.equals("fun") && !waitClass) {
                 b++;
             }
             if (operatorsC.contains(currToken)) {
                 c++;
             }
 
-            if (waitClass && prevToken.equals(":") && currTokenType.equals("Identifier") && tokens.get(i - 2).getText().equals(")")) {
+            if (waitClass && prevToken.equals(":") && currTokenType.equals("Identifier") && 0 <= i - 2
+                    && tokens.get(i - 2).getText().equals(")")) {
                 value = currToken;
                 waitClass = false;
                 extend.put(key, value);
@@ -96,9 +96,9 @@ public class Parse {
                 waitClass = false;
                 extend.put(key, "");
             }
-            if (waitStartClass && currToken.equals("{")){
-                waitStartClass=false;
-                startClass=true;
+            if (waitStartClass && currToken.equals("{")) {
+                waitStartClass = false;
+                startClass = true;
             }
             if (currToken.equals("override")) {
                 override++;
@@ -127,7 +127,8 @@ public class Parse {
                     if (totalBracket == 0) startClass = false;
                 }
             }
-            if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const")) && !fun && startClass) {
+            if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const"))
+                    && !fun && startClass && !waitClass) {
                 fields++;
             }
             //  System.out.println("token " + currToken + " tokentype " + currTokenType);

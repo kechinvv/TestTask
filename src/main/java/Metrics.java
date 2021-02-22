@@ -24,6 +24,7 @@ public class Metrics {
         A += a;
         B += b;
         C += c;
+       // System.out.println(a+ " "+b + " "+c);
         averageOverride += override;
         countClasses+=countClass;
         averageFields += fields;

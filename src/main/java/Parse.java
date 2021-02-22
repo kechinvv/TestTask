@@ -54,7 +54,7 @@ public class Parse {
         int c = 0;
         HashMap<String, String> extend = new HashMap<>();
         HashSet<String> operatorsA = new HashSet<String>(List.of("++", "--", "=", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=", "&=", "!=", "^=", ">>>="));
-        HashSet<String> operatorsC = new HashSet<String>(List.of("?:","===","!==", "==", "!=", ">=", "<=", ">", "<", "!", "else", "if", "?", "try", "catch", "when"));
+        HashSet<String> operatorsC = new HashSet<String>(List.of("?:", "===", "!==", "==", "!=", ">=", "<=", ">", "<", "!", "else", "if", "?", "try", "catch", "when"));
         CharStream charFile = CharStreams.fromFileName(file.getAbsolutePath());
         KotlinLexer lexer = new KotlinLexer(charFile);
         TokenStream tokens = new CommonTokenStream(lexer);
@@ -65,11 +65,22 @@ public class Parse {
             if (i > 0) prevToken = tokens.get(i - 1).getText();
             String currToken = tokens.get(i).getText();
             String currTokenType = lexer.getVocabulary().getDisplayName(tokens.get(i).getType());
+
+
+            if (waitClass && currTokenType.equals("Identifier") && tokens.size() > i + 1
+                    && tokens.get(i + 1).getText().equals("(")) {
+                value = currToken;
+                waitClass = false;
+                extend.put(key, value);
+            }
+
+
             if (prevToken.equals("class") && currTokenType.equals("Identifier")) {
                 key = currToken;
                 waitClass = true;
                 countClass++;
                 waitStartClass = true;
+               // System.out.println("class "+prevToken);
             }
             if ((currToken.equals("val") || currToken.equals("var") || currToken.equals("const")) && tokens.size() > i + 2
                     && operatorsA.contains(tokens.get(i + 2).getText())) {
@@ -79,19 +90,15 @@ public class Parse {
                 a++;
             }
             if (currTokenType.equals("Identifier") && tokens.get(i + 1).getText().equals("(") && tokens.size() > i + 1
-                    && !prevToken.equals("fun") && !waitClass) {
+                    && !prevToken.equals("fun") && !waitStartClass) {
                 b++;
             }
+
             if (operatorsC.contains(currToken)) {
                 c++;
             }
 
-            if (waitClass && prevToken.equals(":") && currTokenType.equals("Identifier") && 0 <= i - 2
-                    && tokens.get(i - 2).getText().equals(")")) {
-                value = currToken;
-                waitClass = false;
-                extend.put(key, value);
-            }
+
             if (waitClass && (currToken.equals("{") || currToken.equals("="))) {
                 waitClass = false;
                 extend.put(key, "");
@@ -100,7 +107,7 @@ public class Parse {
                 waitStartClass = false;
                 startClass = true;
             }
-            if (currToken.equals("fun") && prevToken.equals("override") ) {
+            if (currToken.equals("fun") && prevToken.equals("override")) {
                 override++;
             }
 
@@ -130,12 +137,13 @@ public class Parse {
             if ((currToken.equals("var") || currToken.equals("val") || currToken.equals("const"))
                     && !fun && startClass && !waitClass) {
                 fields++;
+              //  System.out.println("field "+tokens.get(i+1).getText());
             }
             //  System.out.println("token " + currToken + " tokentype " + currTokenType);
         }
 
         metrics.metricHandler(a, b, c, fields, override, extend, countClass);
-        PrintTree.printTree(tree, 0, lexer);
+        //PrintTree.printTree(tree, 0, lexer);
         //  System.out.println("fields=" + fields + " override=" + override + " a metric=" + a + " b metric=" + b + " c metric=" + c);
     }
 
